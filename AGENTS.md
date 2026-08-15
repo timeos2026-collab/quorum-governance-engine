@@ -42,6 +42,48 @@ Do this as your first step, before writing any feature code. `DESIGN.md` and the
 updated `src/client/index.css` must be part of the same turn's changes so they
 are committed together. All subsequent UI work must follow this style guide.
 
+## QUORUM — product state (READ FIRST)
+
+QUORUM is an AI-native **decision-governance engine** for crypto & digital
+assets. It is ONE shared engine with five business-line modules attached, not
+five apps. Canonical pipeline (identical for every module — only inputs and
+module-specific risk checks differ):
+
+`OBSERVATION → AGENT THESIS → DEBATE → RECONCILIATION → VALIDATION → RISK GATE
+→ (PAPER/SHADOW →) HUMAN APPROVAL → ACTION → AUDIT RECORD`
+
+Business lines: Trading, Private Equity (pre-launch/TGE), Private Credit
+(on-chain lending), Investment Banking (advisory), AUM (allocator reporting).
+
+### Non-negotiable product rules
+- Never present seeded/demo data as live. Every stored row carries `dataOrigin`
+  (`seed | ingested | manual`) and the UI renders that tag.
+- Agent consensus never bypasses validation; validation never bypasses the risk gate.
+- No module implements its own risk or audit logic — always the shared engine.
+- Regulatory/jurisdiction facts are **versioned assertions** (`effectiveFrom`/
+  `effectiveTo`, `source`, `sourceTimestamp`), never hard-coded permanent truths.
+- Tier and gate by token category + jurisdiction; crypto is not one asset class.
+- Everything defaults to PAPER/SHADOW until a human explicitly promotes it.
+- Human overrides are preserved permanently in the audit trail.
+
+### Build progress (slices)
+- **Slice 1 — Registry: DONE.** `src/server/core/registry/` (`db.ts`, `seed.ts`,
+  `index.ts`), module `registry` registered in `src/server/app.ts`; migration
+  v2 seeds reference data. Stores: `registryChains`, `registryVenues`,
+  `registryTokens`, `registryJurisdictions`, `registryRegulatoryFacts`
+  (versioned assertions). Queries: `registry.overview`, `listChains`,
+  `listVenues`, `listJurisdictions`, `listTokens`, `regulatoryFacts`.
+  UI: `/` = Registry console (`pages/HomePage.tsx`), app shell in
+  `components/Page.tsx` (sidebar lists later stages as inert `SOON` items).
+  Data is 100% SEED — no ingestion source connected.
+- Slices 2–15 (evidence, agent swarm, debate, validation, risk gate, paper
+  execution, the five modules, command center, provenance, jobs): NOT BUILT.
+
+Key registry conventions: `tierForCategory()` derives Tier 1/2/3 from token
+category; tokens store `capitalOriginJurisdictionId` separately from
+`liquidityVenueJurisdictionId` (SA exchange control); Nigeria pre-approval is a
+jurisdiction rule (`requiresPreApproval`), not a token special case.
+
 ## Comprehensive Project Structure Overview
 
 ### 1. PROJECT STRUCTURE

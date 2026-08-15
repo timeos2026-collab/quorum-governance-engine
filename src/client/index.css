@@ -1,12 +1,121 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 @import "tailwindcss";
 
 @source "./";
 
-/* Base UI: establish a stacking context at the root so portalled
-   popups (Dialog, Select, Menu, Tooltip) layer above page content. */
+/* ---------------------------------------------------------------
+   QUORUM — institutional governance terminal.
+   Deep graphite surfaces, signal-amber accent, verdict colors.
+   See DESIGN.md for the full brief.
+   --------------------------------------------------------------- */
+
+@theme {
+  /* Surfaces */
+  --color-ink-900: #07090c;
+  --color-ink-800: #0c1016;
+  --color-ink-700: #11161e;
+  --color-ink-600: #171d27;
+  --color-ink-500: #1f2733;
+  --color-line: #232c39;
+  --color-line-strong: #33404f;
+
+  /* Text */
+  --color-fg: #e6ebf2;
+  --color-fg-muted: #93a1b3;
+  --color-fg-faint: #5f6d80;
+
+  /* Accent — signal amber (quorum reached) */
+  --color-signal-500: #e0a33a;
+  --color-signal-400: #f0b954;
+  --color-signal-600: #b07d22;
+  --color-signal-soft: #2a2113;
+
+  /* Verdict semantics */
+  --color-verified-500: #35b98a;
+  --color-verified-soft: #10281f;
+  --color-caution-500: #d98b3c;
+  --color-caution-soft: #2a1e11;
+  --color-blocked-500: #d8544f;
+  --color-blocked-soft: #2b1414;
+  --color-inferred-500: #6f8fd8;
+  --color-inferred-soft: #151d2e;
+
+  /* Typography */
+  --font-display: 'Space Grotesk', ui-sans-serif, system-ui;
+  --font-sans: 'IBM Plex Sans', ui-sans-serif, system-ui;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+
+  /* Radius — tight, instrument-panel feel */
+  --radius-xs: 2px;
+  --radius-sm: 3px;
+  --radius-md: 5px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+
+  /* Motion */
+  --animate-fade-in: fade-in 0.35s ease-out both;
+  --animate-slide-up: slide-up 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-pulse-signal: pulse-signal 2.4s ease-in-out infinite;
+  --animate-scan: scan 3s linear infinite;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse-signal {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+@keyframes scan {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
 html {
   isolation: isolate;
+  color-scheme: dark;
 }
+
 body {
   position: relative;
+  background-color: var(--color-ink-900);
+  color: var(--color-fg);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
 }
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  letter-spacing: -0.015em;
+}
+
+/* Reusable utility layers */
+@utility quorum-grid {
+  background-image:
+    linear-gradient(to right, color-mix(in srgb, var(--color-line) 55%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--color-line) 55%, transparent) 1px, transparent 1px);
+  background-size: 44px 44px;
+}
+
+@utility label-caps {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-fg-faint);
+}
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--color-ink-900); }
+::-webkit-scrollbar-thumb { background: var(--color-ink-500); border-radius: 6px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-line-strong); }
+
+::selection { background: var(--color-signal-600); color: #0b0d10; }
