@@ -14,13 +14,21 @@ import { Store, schema } from 'modelence/server';
  * reference data can never be rendered as live data.
  */
 
-/** Where a stored value came from. Seeded data must never be shown as live. */
-export const dataOriginValues = ['seed', 'ingested', 'manual'] as const;
+/**
+ * Where a stored value came from. Seeded and simulated data must never be
+ * shown as live.
+ * - `seed`      — written by a seed migration (static reference data)
+ * - `simulated` — produced by a synthetic ingestion job (no real feed attached)
+ * - `ingested`  — retrieved from a real external source
+ * - `manual`    — entered by a human operator
+ */
+export const dataOriginValues = ['seed', 'simulated', 'ingested', 'manual'] as const;
 export type DataOrigin = (typeof dataOriginValues)[number];
 
 /** Provenance strength of a claim. Used across the whole engine. */
 export const verifiabilityValues = [
   'verified',
+  'inferred',
   'model_inference',
   'assumption',
   'unverified',

@@ -57,7 +57,7 @@ Business lines: Trading, Private Equity (pre-launch/TGE), Private Credit
 
 ### Non-negotiable product rules
 - Never present seeded/demo data as live. Every stored row carries `dataOrigin`
-  (`seed | ingested | manual`) and the UI renders that tag.
+  (`seed | simulated | ingested | manual`) and the UI renders that tag.
 - Agent consensus never bypasses validation; validation never bypasses the risk gate.
 - No module implements its own risk or audit logic — always the shared engine.
 - Regulatory/jurisdiction facts are **versioned assertions** (`effectiveFrom`/
@@ -76,7 +76,31 @@ Business lines: Trading, Private Equity (pre-launch/TGE), Private Credit
   UI: `/` = Registry console (`pages/HomePage.tsx`), app shell in
   `components/Page.tsx` (sidebar lists later stages as inert `SOON` items).
   Data is 100% SEED — no ingestion source connected.
-- Slices 2–15 (evidence, agent swarm, debate, validation, risk gate, paper
+- **Slice 2 — Evidence layer: DONE.** `src/server/core/evidence/`:
+  - `db.ts` — `coreObservations` (observationKey unique, sourceType, source,
+    observedAt, retrievalTimestamp, verifiability, relevantEntity*, metric,
+    value, unit, statement, jobRunId, generatorVersion, dataOrigin) and
+    `coreJobRuns` (append-only ledger; `(jobId, runKey)` unique).
+  - `generators.ts` — DETERMINISTIC synthetic feeds for the 5 source types
+    (on_chain, market_microstructure, narrative_social, regulatory, security).
+    Output is a pure function of `(runKey, entity, metric)` via FNV-1a + PRNG, so
+    replays are byte-identical. `GENERATOR_VERSION` stamped on every row.
+    **Replacing a real feed = replacing this file only.** Tier profiles make
+    fresh-launch/micro-cap readings genuinely adverse.
+  - `ingest.ts` — `runIngestion()` is the ONLY write path. Opens a job-run row,
+    inserts observations keyed `jobId:runKey:entityId:metric`, treats E11000 as
+    `skipped`, always closes the row (even on crash). An already-recorded run key
+    returns `status: 'skipped'` — replay never forks or overwrites history.
+  - `index.ts` — module `evidence`: queries `overview`, `feed`, `jobRuns`;
+    mutations `runCycle` (manual cycle across all 5 sources), `replayRun`
+    (determinism proof); 5 cron jobs, cadence = idempotency bucket width
+    (micro 5m, on-chain 15m, narrative 30m, security 1h, regulatory 6h).
+  - UI: `/evidence` (`pages/EvidencePage.tsx`), nav item wired in `Page.tsx`.
+  - Data is 100% `simulated` — sources prefixed `synthetic:`, page shows a
+    "SIMULATED EVIDENCE — NOT LIVE" banner while `provenance.ingested === 0`.
+  - `verifiability` is load-bearing: KOL posts stored as `social_claim`,
+    classification chatter as `inferred` and NEVER auto-applied to the registry.
+- Slices 3–15 (agent swarm, debate, validation, risk gate, paper
   execution, the five modules, command center, provenance, jobs): NOT BUILT.
 
 Key registry conventions: `tierForCategory()` derives Tier 1/2/3 from token

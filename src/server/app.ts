@@ -1,11 +1,12 @@
 import { startApp } from 'modelence/server';
 import exampleModule from '@/server/example';
 import registryModule from '@/server/core/registry';
+import evidenceModule from '@/server/core/evidence';
 import { createDemoUser } from '@/server/migrations/createDemoUser';
 import { seedRegistry } from '@/server/core/registry/seed';
 
 startApp({
-  modules: [exampleModule, registryModule],
+  modules: [exampleModule, registryModule, evidenceModule],
 
   security: {
     frameAncestors: ['https://modelence.com', 'https://*.modelence.com', 'http://localhost:*', 'https://*.exp.direct'],
