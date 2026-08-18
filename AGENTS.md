@@ -100,7 +100,38 @@ Business lines: Trading, Private Equity (pre-launch/TGE), Private Credit
     "SIMULATED EVIDENCE — NOT LIVE" banner while `provenance.ingested === 0`.
   - `verifiability` is load-bearing: KOL posts stored as `social_claim`,
     classification chatter as `inferred` and NEVER auto-applied to the registry.
-- Slices 3–15 (agent swarm, debate, validation, risk gate, paper
+- **Slice 3 — Agent swarm: DONE.** `src/server/core/agents/`:
+  - `db.ts` — `coreAgents` (roster rows: mandate, sourceScope, metricScope,
+    `maxConfidence` ceiling, enabled flag) and `coreTheses` (immutable; stance,
+    confidence + `confidenceCap`/`confidenceCapReason`, rationale,
+    `falsifiableCondition`, `weakestLink`, `citedObservationKeys`,
+    `evidenceGaps`, `weakestVerifiability`, `evidenceOrigins`, evidence window,
+    `status: ACTIVE|SUPERSEDED`). Reconciliation supersedes, never edits.
+  - `roster.ts` — the 8 core agents, RULE-BASED and deterministic (no LLM, no
+    randomness): flow-analyst, liquidity-analyst, volume-integrity,
+    narrative-analyst (ceiling 45 — attention is never fundamentals),
+    regulatory-analyst, security-analyst, structure-analyst, red-team
+    (ceiling 70 so pessimism can't dominate on confidence).
+    `AGENT_GENERATOR_VERSION` must be bumped on any reasoning change.
+  - `run.ts` — `runThesisCycle()` on the shared `coreJobRuns` ledger
+    (`jobId: 'agents.thesis'`). Engine rules applied ON TOP of agent output in
+    `runAgent()`: **no citations ⇒ forced ABSTAIN at 0**; confidence clamped by
+    agent ceiling AND by weakest cited verifiability (social_claim/unverified
+    cap 40); thin-citation cap of 45 — **exempt for BLOCK_RECOMMENDED
+    (asymmetric evidence burden: refusing to act needs less evidence than
+    acting)**. Bounded by explicit `asOf` so a thesis is always formed over the
+    evidence visible at that moment.
+  - `seed.ts` + migration v3 — upserts the roster; `$setOnInsert` protects the
+    operator `enabled` flag from being clobbered on re-seed.
+  - `index.ts` — module `agents`: queries `overview`, `roster`, `theses`,
+    `thesisEvidence` (provenance walk thesis → observation → job run, and
+    reports `unresolvedCitations` which must always be 0); mutations `runCycle`,
+    `replayCycle`, `setAgentEnabled`; 30m cron.
+  - UI: `/agents` (`pages/AgentsPage.tsx`) — expandable thesis cards showing
+    citations, gaps, cap reason and falsifiable condition; roster tab.
+  - Theses inherit provenance: `dataOrigin` is `ingested` only if cited evidence
+    is; otherwise `simulated`. A thesis can never be more live than its evidence.
+- Slices 4–15 (debate, validation, risk gate, paper
   execution, the five modules, command center, provenance, jobs): NOT BUILT.
 
 Key registry conventions: `tierForCategory()` derives Tier 1/2/3 from token

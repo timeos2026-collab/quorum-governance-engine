@@ -44,7 +44,7 @@ type NavItem = {
 const ENGINE_NAV: NavItem[] = [
   { label: 'Registry', to: '/', icon: Database },
   { label: 'Evidence', to: '/evidence', icon: Radar },
-  { label: 'Agent Swarm', icon: Users },
+  { label: 'Agent Swarm', to: '/agents', icon: Users },
   { label: 'Debate', icon: Swords },
   { label: 'Validation', icon: FlaskConical },
   { label: 'Risk Gate', icon: ShieldCheck },

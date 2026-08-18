@@ -2,11 +2,13 @@ import { startApp } from 'modelence/server';
 import exampleModule from '@/server/example';
 import registryModule from '@/server/core/registry';
 import evidenceModule from '@/server/core/evidence';
+import agentsModule from '@/server/core/agents';
+import { seedAgentRoster } from '@/server/core/agents/seed';
 import { createDemoUser } from '@/server/migrations/createDemoUser';
 import { seedRegistry } from '@/server/core/registry/seed';
 
 startApp({
-  modules: [exampleModule, registryModule, evidenceModule],
+  modules: [exampleModule, registryModule, evidenceModule, agentsModule],
 
   security: {
     frameAncestors: ['https://modelence.com', 'https://*.modelence.com', 'http://localhost:*', 'https://*.exp.direct'],
@@ -22,6 +24,11 @@ startApp({
       version: 2,
       description: 'Seed QUORUM core registry (chains, venues, tokens, jurisdictions) — dataOrigin: seed',
       handler: seedRegistry,
+    },
+    {
+      version: 3,
+      description: 'Seed QUORUM core agent roster (8 core agents) — dataOrigin: seed',
+      handler: seedAgentRoster,
     },
   ],
 });
