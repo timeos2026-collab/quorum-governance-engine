@@ -131,8 +131,35 @@ Business lines: Trading, Private Equity (pre-launch/TGE), Private Credit
     citations, gaps, cap reason and falsifiable condition; roster tab.
   - Theses inherit provenance: `dataOrigin` is `ingested` only if cited evidence
     is; otherwise `simulated`. A thesis can never be more live than its evidence.
-- Slices 4–15 (debate, validation, risk gate, paper
-  execution, the five modules, command center, provenance, jobs): NOT BUILT.
+- **Slice 4 — Debate engine: DONE.** `src/server/core/debate/`:
+  - `db.ts` — `coreDebates`, `coreDebateParticipants`, `coreThesisChallenges`,
+    `coreDebateRounds`, `coreDebateOutcomes`. All append-only.
+  - `engine.ts` — `DEBATE_ENGINE_VERSION`. `generateChallenges()` (agents may
+    only attack from their OWN mandate: 6 challenge types), `adjudicate()`
+    (every ruling names a rule — HARD_BLOCKER_PRECEDENCE,
+    CLAIM_CANNOT_CARRY_DIRECTION, DIRECTIONAL_WITHOUT_EXIT_PATH,
+    NON_ECONOMIC_VOLUME_INVALIDATES_MOMENTUM, THIN_EVIDENCE_UNDER_SELF_DECLARED_RISK,
+    MATERIAL_EVIDENCE_GAPS, IMMATERIAL_GAP, DECLARED_RISK_IS_NOT_DEFEAT,
+    DEFENDER_PRICED_LIQUIDITY; burden is on the challenger), `resolve()`.
+  - **CONFIDENCE IS NEVER AVERAGED AND VOTES ARE NEVER COUNTED.** The outcome
+    carries ONE surviving thesis's own confidence via `convictionSource`, with
+    `convictionFloor` reported alongside. Bulls vs bears both surviving ⇒
+    `CONTESTED`, never a split-the-difference number. A surviving
+    BLOCK_RECOMMENDED ends the debate (`BLOCKED_BY_DEBATE`) regardless of how
+    many agents were bullish.
+  - Dissent is preserved permanently for ALL participants, including defeated
+    ones (`dissent[]` + `survived` on participants). Losing an argument does not
+    erase it.
+  - Every outcome stores `requiresValidation: true` — a debate outcome
+    authorises nothing. Consensus must still pass Slice 5 validation and the
+    Slice 6 risk gate.
+  - `run.ts` — `runDebateCycle()` on the shared ledger (`jobId:
+    'debate.reconcile'`, `runKey = debate:<thesisRunKey>`), one debate per
+    subject per thesis run, 3 rounds (OPENING / CHALLENGE / RECONCILIATION).
+  - `index.ts` — module `debate`: queries `overview`, `outcomes`, `transcript`;
+    mutation `runCycle`; 30m cron. UI: `/debate` (`pages/DebatePage.tsx`).
+- Slices 5–15 (validation, risk gate, paper execution, the five modules,
+  command center, provenance, jobs): NOT BUILT.
 
 Key registry conventions: `tierForCategory()` derives Tier 1/2/3 from token
 category; tokens store `capitalOriginJurisdictionId` separately from

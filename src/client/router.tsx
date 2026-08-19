@@ -51,6 +51,10 @@ const publicRoutes: RouteObject[] = [
     Component: lazy(() => import('./pages/AgentsPage'))
   },
   {
+    path: '/debate',
+    Component: lazy(() => import('./pages/DebatePage'))
+  },
+  {
     path: '/example/:itemId',
     Component: lazy(() => import('./pages/ExamplePage'))
   },
