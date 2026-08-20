@@ -375,9 +375,13 @@ export default function HomePage() {
         <div className="flex animate-fade-in items-start gap-3 rounded-lg border border-line bg-ink-700 px-4 py-3 text-sm text-fg-muted">
           <Info className="mt-0.5 size-4 shrink-0 text-fg-faint" />
           <p>
-            Downstream stages — evidence ingestion, agent swarm, debate, validation, risk gate and
-            the five business-line modules — are not built yet. They are listed in the left rail as
-            inert placeholders so the pipeline order stays visible while it is assembled.
+            <span className="text-fg">Registry, evidence ingestion, the agent swarm and the debate
+            engine are built and running.</span>{' '}
+            The remaining stages — validation, risk gate, paper/shadow execution and the five
+            business-line modules — are not built yet and appear in the left rail as inert
+            placeholders so the pipeline order stays visible while it is assembled. Nothing
+            downstream of debate can authorise an action until the validation and risk-gate stages
+            exist.
           </p>
         </div>
       </div>

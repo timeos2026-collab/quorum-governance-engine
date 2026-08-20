@@ -158,8 +158,39 @@ Business lines: Trading, Private Equity (pre-launch/TGE), Private Credit
     subject per thesis run, 3 rounds (OPENING / CHALLENGE / RECONCILIATION).
   - `index.ts` — module `debate`: queries `overview`, `outcomes`, `transcript`;
     mutation `runCycle`; 30m cron. UI: `/debate` (`pages/DebatePage.tsx`).
-- Slices 5–15 (validation, risk gate, paper execution, the five modules,
-  command center, provenance, jobs): NOT BUILT.
+- **Slice 5 — Validation engine: DONE.** `src/server/core/validation/`:
+  - `db.ts` — `coreStrategies` (lifecycle DISCOVERED → UNDER_TEST →
+    FAILED|PASSED → PAPER → SHADOW → PRODUCTION → RETIRED), `coreValidationRuns`,
+    `coreValidationTests`, `coreStrategyTransitions` (append-only lifecycle
+    ledger). `AUTOMATED_TRANSITIONS` is the machine-readable statement of what
+    the engine may do alone — SHADOW/PRODUCTION are absent from it on purpose.
+  - `harness.ts` — six tests: SURVIVORSHIP_CORRECTED_BACKTEST, WALK_FORWARD,
+    REGIME_DECOMPOSITION, SLIPPAGE_ON_REAL_DEPTH, WASH_ADJUSTED_VOLUME,
+    ADVERSARIAL_RED_TEAM. **The last three read real observations from the
+    evidence layer; the first three derive a deterministic synthetic track
+    record because no price history is connected.** That split is labelled on
+    every test row and in the UI. Do NOT silently blend the two.
+  - `verdictFor()` — **tests are never scored or averaged.** Strict precedence:
+    any FAIL ⇒ FAILED (`ANY_FAILED_TEST_FAILS_THE_STRATEGY`); any INCONCLUSIVE ⇒
+    HELD at UNDER_TEST (`INCONCLUSIVE_IS_NOT_A_PASS`); only a clean sweep passes.
+    Missing evidence is treated as unusable, never as clean.
+  - `run.ts` — `runValidationCycle()` on the shared ledger (`jobId:
+    'validation.cycle'`, `runKey = validate:<debateRunKey>`). Phase 1 promotes
+    ONLY `DIRECTIONAL_CONSENSUS` + BULLISH/BEARISH debate outcomes into
+    candidates — blocked/contested debates produce nothing. Phase 2 tests every
+    DISCOVERED/UNDER_TEST candidate. `transition()` is the single guard for all
+    lifecycle moves and throws if the engine attempts a human-only one.
+  - PASSED auto-promotes to PAPER and stops there. `validation.promoteStrategy`
+    is the only path past PAPER, requires auth, records the userId permanently,
+    and refuses stage-skipping.
+  - `index.ts` — module `validation`: queries `overview`, `strategies`,
+    `dossier`; mutations `runCycle`, `promoteStrategy`; 30m cron.
+    UI: `/validation` (`pages/ValidationPage.tsx`).
+  - Known gap: FAILED is terminal. Re-examining a failed idea requires a fresh
+    debate producing a new candidate — deliberate, so a strategy can't be
+    quietly re-run until it passes.
+- Slices 6–15 (risk gate, paper execution, the five modules, command center,
+  provenance, jobs): NOT BUILT.
 
 Key registry conventions: `tierForCategory()` derives Tier 1/2/3 from token
 category; tokens store `capitalOriginJurisdictionId` separately from
