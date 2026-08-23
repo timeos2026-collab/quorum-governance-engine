@@ -5,6 +5,7 @@ import evidenceModule from '@/server/core/evidence';
 import agentsModule from '@/server/core/agents';
 import debateModule from '@/server/core/debate';
 import validationModule from '@/server/core/validation';
+import riskModule from '@/server/core/risk';
 import { seedAgentRoster } from '@/server/core/agents/seed';
 import { createDemoUser } from '@/server/migrations/createDemoUser';
 import { seedRegistry } from '@/server/core/registry/seed';
@@ -17,6 +18,7 @@ startApp({
     agentsModule,
     debateModule,
     validationModule,
+    riskModule,
   ],
 
   security: {

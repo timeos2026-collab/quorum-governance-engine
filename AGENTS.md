@@ -189,8 +189,37 @@ Business lines: Trading, Private Equity (pre-launch/TGE), Private Credit
   - Known gap: FAILED is terminal. Re-examining a failed idea requires a fresh
     debate producing a new candidate — deliberate, so a strategy can't be
     quietly re-run until it passes.
-- Slices 6–15 (risk gate, paper execution, the five modules, command center,
-  provenance, jobs): NOT BUILT.
+- **Slice 6 — Risk gate: DONE.** `src/server/core/risk/`:
+  - `db.ts` — `coreRiskPolicies` (versioned mirror of the in-code ruleset),
+    `coreRiskAssessments`, `coreRiskFindings`, `coreRiskOverrides` (append-only,
+    permanent). `mostRestrictive()` + `VERDICT_SEVERITY` implement the
+    combination rule: **findings are never scored or averaged**, the harshest
+    verdict wins and the rule that produced it is named as `decisiveRuleId`.
+  - `rules.ts` — nine rules, `RISK_ENGINE_VERSION = 'risk-gate@1.0.0'`:
+    VALIDATION_PREREQUISITE, JUR_PRE_APPROVAL_REQUIRED (Nigeria-style per-token
+    SEC pre-approval; meme coins are NOT exempt), TIER3_UNCLASSIFIED_UNLOCKED_LP
+    (hard BLOCK, not a soft warning), CAPITAL_ORIGIN_VENUE_MISMATCH (SA exchange
+    control — reads `capitalOriginJurisdictionId` separately from the liquidity
+    venue), CONTRACT_SECURITY_POSTURE, HOLDER_CONCENTRATION,
+    EXIT_DEPTH_SUFFICIENCY, TIER_POSITION_CEILING ($500k/$100k/$15k by tier),
+    EXECUTION_MODE_CEILING. Each rule declares `overridable`; the four hard
+    blocks are not.
+  - `run.ts` — `runGateCycle()` on the shared ledger (`jobId: 'risk.gate'`,
+    `runKey = gate:<validationRunKey>`). `syncPolicies()` mirrors the ruleset
+    into the policy store with `$setOnInsert` so `effectiveFrom` is never
+    rewritten. Every assessment stamps `policyKeys[]` so a decision replays
+    rule-for-rule against the versions actually in force.
+  - **Validation is re-checked as a rule inside the gate, not assumed by the
+    caller** — consensus cannot route around it.
+  - `index.ts` — module `risk`: queries `overview`, `policies`, `assessments`,
+    `findings`; mutations `runCycle`, `overrideAssessment`, `syncPolicies`; 30m
+    cron. UI: `/risk` (`pages/RiskGatePage.tsx`).
+  - `overrideAssessment` requires auth + a ≥20-char reason, writes a NEW
+    permanent record (the original assessment is never edited), and **refuses to
+    release a BLOCKED assessment** — clearing a hard block requires changing the
+    rule or the fact, both versioned.
+- Slices 7–15 (paper/shadow execution, the five business-line modules, command
+  center, provenance/audit console, job orchestration): NOT BUILT.
 
 Key registry conventions: `tierForCategory()` derives Tier 1/2/3 from token
 category; tokens store `capitalOriginJurisdictionId` separately from

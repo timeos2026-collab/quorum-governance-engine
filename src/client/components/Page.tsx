@@ -47,7 +47,7 @@ const ENGINE_NAV: NavItem[] = [
   { label: 'Agent Swarm', to: '/agents', icon: Users },
   { label: 'Debate', to: '/debate', icon: Swords },
   { label: 'Validation', to: '/validation', icon: FlaskConical },
-  { label: 'Risk Gate', icon: ShieldCheck },
+  { label: 'Risk Gate', to: '/risk', icon: ShieldCheck },
   { label: 'Audit Trail', icon: FileClock },
 ];
 

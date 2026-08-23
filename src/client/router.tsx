@@ -59,6 +59,10 @@ const publicRoutes: RouteObject[] = [
     Component: lazy(() => import('./pages/ValidationPage'))
   },
   {
+    path: '/risk',
+    Component: lazy(() => import('./pages/RiskGatePage'))
+  },
+  {
     path: '/example/:itemId',
     Component: lazy(() => import('./pages/ExamplePage'))
   },
