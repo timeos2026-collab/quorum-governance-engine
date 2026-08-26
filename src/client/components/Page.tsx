@@ -16,6 +16,7 @@ import {
   Swords,
   FlaskConical,
   ShieldCheck,
+  Terminal,
   FileClock,
   LineChart,
   Landmark,
@@ -48,6 +49,7 @@ const ENGINE_NAV: NavItem[] = [
   { label: 'Debate', to: '/debate', icon: Swords },
   { label: 'Validation', to: '/validation', icon: FlaskConical },
   { label: 'Risk Gate', to: '/risk', icon: ShieldCheck },
+  { label: 'Execution', to: '/execution', icon: Terminal },
   { label: 'Audit Trail', icon: FileClock },
 ];
 
