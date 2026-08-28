@@ -125,6 +125,10 @@ async function decideMode(
   const lifecycleCeiling: ExecutionMode =
     strategyState === 'PRODUCTION' ? 'PRODUCTION' : strategyState === 'SHADOW' ? 'SHADOW' : 'PAPER';
 
+  // 'NONE' on a frozen assessment means the gate refused execution at the time
+  // it was written. It can only be reached here after a human override changed
+  // the verdict, and the override never grants more than paper — so NONE
+  // collapses to PAPER rather than to the assessment's stale ceiling.
   const gateCeiling: ExecutionMode =
     gateMode === 'PRODUCTION' ? 'PRODUCTION' : gateMode === 'SHADOW' ? 'SHADOW' : 'PAPER';
 

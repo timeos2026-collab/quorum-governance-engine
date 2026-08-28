@@ -375,13 +375,13 @@ export default function HomePage() {
         <div className="flex animate-fade-in items-start gap-3 rounded-lg border border-line bg-ink-700 px-4 py-3 text-sm text-fg-muted">
           <Info className="mt-0.5 size-4 shrink-0 text-fg-faint" />
           <p>
-            <span className="text-fg">The engine runs end to end through the risk gate:</span>{' '}
-            registry, evidence ingestion, the agent swarm, the debate engine, the validation engine
-            and the risk gate are all built and running. What remains — paper/shadow execution, the
-            five business-line modules, the human command centre and the audit-trail console —
-            appears in the left rail as inert placeholders so the pipeline order stays visible while
-            it is assembled. Nothing can execute yet: the gate can authorise, but no execution stage
-            exists to act on the authorisation.
+            <span className="text-fg">The engine runs end to end through paper execution:</span>{' '}
+            registry, evidence ingestion, the agent swarm, the debate engine, the validation engine,
+            the risk gate and paper/shadow execution are all built and running. Every fill is
+            synthetic and tagged as such — no venue is connected. What remains — the five
+            business-line modules, the human command centre and the audit-trail console — appears in
+            the left rail as inert placeholders so the pipeline order stays visible while it is
+            assembled.
           </p>
         </div>
       </div>

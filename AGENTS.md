@@ -218,8 +218,46 @@ Business lines: Trading, Private Equity (pre-launch/TGE), Private Credit
     permanent record (the original assessment is never edited), and **refuses to
     release a BLOCKED assessment** — clearing a hard block requires changing the
     rule or the fact, both versioned.
-- Slices 7–15 (paper/shadow execution, the five business-line modules, command
-  center, provenance/audit console, job orchestration): NOT BUILT.
+- **Slice 7 — Paper/shadow execution: DONE.** `src/server/core/execution/`:
+  - `db.ts` — `executionOrders` (`orderKey = execution:${assessmentKey}`, unique)
+    and `executionFills` (`fillKey = fill:${orderKey}`, unique). Both keys derive
+    from the assessment, not a timestamp, so a replay collides on the index
+    rather than opening a second position against one decision.
+  - **No price here is real.** `syntheticFillPrice(orderKey, symbol)` is a pure
+    FNV-1a-seeded function; every fill is `dataOrigin: 'simulated'` and
+    `generatorVersion: 'execution-synth@1.0.0'`. A live venue would be a new
+    `ingested` writer, never an edit to these rows. The UI banner clears only
+    when an `ingested` fill exists.
+  - `run.ts` — `runPaperCycle()` on the shared ledger, `jobId:
+    'execution.paper'`, `runKey = paper:<riskRunKey>[:ov<n>]`. **The override
+    count is part of the run key on purpose**: without it the first cycle claims
+    the key forever and a later human APPROVE would be recorded and then
+    silently ignored. Same gate run + same overrides ⇒ same key ⇒ zero new rows.
+  - Consumes ONLY `APPROVED` / `APPROVED_WITH_RESTRICTIONS` — and reads
+    `coreRiskOverrides` to get the *effective* verdict, since the gate never
+    edits an assessment. `sourceVerdict` records the transition and the actor.
+  - Re-verifies VALIDATION_PREREQUISITE inline; does not trust the gate's filter.
+  - Size = `min(TIER_POSITION_CEILING, CAPITAL_ORIGIN_VENUE_MISMATCH cap,
+    observed pool_depth_2pct_usd)`. Every candidate cap is stored with its
+    ruleId and a `binding` flag so the min() is auditable. **Execution
+    re-derives no risk rule** — the caps come from the gate's own findings.
+  - No depth observation ⇒ status `RISK_CHECK`, `requiresHumanForDepth: true`,
+    never `APPROVED`. Absence of a measurement is not absence of risk.
+  - 48h mandatory paper embargo for Tier 3 or pre-launch/privateEquity scope,
+    **wall-clock** (`earliestLiveAt`), enforced in `assertSubmittable()` and in
+    the fill phase — not merely displayed. Cycle count is deliberately not an
+    alternative clock.
+  - PRODUCTION requires all three FROM OBSERVED EVIDENCE tests
+    (SLIPPAGE_ON_REAL_DEPTH, WASH_ADJUSTED_VOLUME, ADVERSARIAL_RED_TEAM) to be
+    present and PASS on `lastValidationRunKey`. The three DERIVED TRACK RECORD
+    tests can never substitute.
+  - `index.ts` — module `execution`: queries `overview`, `orders`, `fills`;
+    mutations `runCycle`, `submitOrder`; 15m cron (faster than the 30m risk and
+    validation cycles — Tier 3 depth has a short half-life). **No promote
+    mutation**: `validation.promoteStrategy` is the only lifecycle path.
+    UI: `/execution` (`pages/ExecutionPage.tsx`).
+- Slices 8–15 (the five business-line modules, command center, provenance/audit
+  console, job orchestration): NOT BUILT.
 
 Key registry conventions: `tierForCategory()` derives Tier 1/2/3 from token
 category; tokens store `capitalOriginJurisdictionId` separately from
