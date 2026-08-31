@@ -377,11 +377,11 @@ export default function HomePage() {
           <p>
             <span className="text-fg">The engine runs end to end through paper execution:</span>{' '}
             registry, evidence ingestion, the agent swarm, the debate engine, the validation engine,
-            the risk gate and paper/shadow execution are all built and running. Every fill is
-            synthetic and tagged as such — no venue is connected. What remains — the five
-            business-line modules, the human command centre and the audit-trail console — appears in
-            the left rail as inert placeholders so the pipeline order stays visible while it is
-            assembled.
+            the risk gate and paper/shadow execution are all built and running, and the first
+            business line — Trading — is attached to them. Every fill is synthetic and tagged as
+            such; no venue is connected. What remains — Private Equity, Private Credit, Investment
+            Banking, AUM, the human command centre and the audit-trail console — appears in the left
+            rail as inert placeholders so the pipeline order stays visible while it is assembled.
           </p>
         </div>
       </div>

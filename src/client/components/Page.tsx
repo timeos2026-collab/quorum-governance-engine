@@ -54,7 +54,7 @@ const ENGINE_NAV: NavItem[] = [
 ];
 
 const MODULE_NAV: NavItem[] = [
-  { label: 'Trading', icon: LineChart },
+  { label: 'Trading', to: '/trading', icon: LineChart },
   { label: 'Private Equity', icon: Landmark },
   { label: 'Private Credit', icon: Banknote },
   { label: 'Investment Banking', icon: Briefcase },

@@ -7,6 +7,7 @@ import debateModule from '@/server/core/debate';
 import validationModule from '@/server/core/validation';
 import riskModule from '@/server/core/risk';
 import executionModule from '@/server/core/execution';
+import tradingModule from '@/server/modules/trading';
 import { seedAgentRoster } from '@/server/core/agents/seed';
 import { createDemoUser } from '@/server/migrations/createDemoUser';
 import { seedRegistry } from '@/server/core/registry/seed';
@@ -21,6 +22,7 @@ startApp({
     validationModule,
     riskModule,
     executionModule,
+    tradingModule,
   ],
 
   security: {

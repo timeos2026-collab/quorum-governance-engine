@@ -256,8 +256,30 @@ Business lines: Trading, Private Equity (pre-launch/TGE), Private Credit
     validation cycles — Tier 3 depth has a short half-life). **No promote
     mutation**: `validation.promoteStrategy` is the only lifecycle path.
     UI: `/execution` (`pages/ExecutionPage.tsx`).
-- Slices 8–15 (the five business-line modules, command center, provenance/audit
-  console, job orchestration): NOT BUILT.
+- Slice 8 DONE — Trading module (first business line), `src/server/modules/trading/`:
+  - `db.ts` — `dbTradingMandates` (`tradingMandates`), key `${deskId}@v${version}`,
+    unique on `mandateKey`. Append-only: a mandate is never edited, a new version
+    is inserted and the previous one gets `effectiveTo`. `DEFAULT_DESK_ID =
+    'trading.primary'`; `SEED_MANDATE` seeds v1 lazily on first read.
+  - `index.ts` — module `trading`: queries `mandate`, `book`, `pipeline`;
+    mutation `setMandate` (auth required, rationale >= 20 chars).
+  - **The desk owns mandate only.** It has no risk rules, no validation, no
+    execution and no audit trail of its own. `checkMandate()` is a pure
+    *narrowing* test applied after the gate — there is deliberately no code path
+    by which a mandate can widen what risk permitted.
+  - **The book is derived, not stored.** There is no desk position table; `book`
+    joins `executionOrders` + `executionFills` + `tokens` + `riskAssessments` so
+    it cannot drift from what execution actually did. Each position carries
+    `provenance` (strategyKey, assessmentKey, gateVerdict, decisiveRuleId,
+    sizeCapReason, jobRunId, generatorVersion).
+  - Out-of-mandate orders (taken under an earlier mandate version) are listed
+    under `excluded` **and still counted in `grossUsd`** via
+    `outOfMandateGrossUsd` — narrowing a mandate must not make existing exposure
+    vanish from the number.
+  - UI: `/trading` (`pages/TradingPage.tsx`), tabs book / pipeline / mandate.
+    `Trading` promoted from inert SOON to a live link in `MODULE_NAV`.
+- Slices 9–15 (Private Equity, Private Credit, Investment Banking, AUM, command
+  center, provenance/audit console, job orchestration): NOT BUILT.
 
 Key registry conventions: `tierForCategory()` derives Tier 1/2/3 from token
 category; tokens store `capitalOriginJurisdictionId` separately from
